@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Tomato Basil Pasta",
+    "cuisine": "Italian",
+    "difficulty": "Easy",
+    "time": 25,
+    "dietary": ["vegetarian"],
+    "servings": 2,
+    "ingredients": ["pasta", "tomato", "basil", "olive oil", "garlic", "salt", "pepper"],
+    "steps": ["Boil pasta", "Make tomato sauce", "Toss together", "Serve with basil"],
+    "nutrition": { "calories": 420, "protein": 12 }
+  },
+  {
+    "id": 2,
+    "title": "Chicken Stir Fry",
+    "cuisine": "Asian",
+    "difficulty": "Medium",
+    "time": 30,
+    "dietary": [],
+    "servings": 2,
+    "ingredients": ["chicken", "soy sauce", "garlic", "bell pepper", "onion", "oil", "rice"],
+    "steps": ["Slice chicken", "Stir fry veggies", "Add chicken and sauce", "Cook until done", "Serve over rice"],
+    "nutrition": { "calories": 520, "protein": 35 }
+  },
+  {
+    "id": 3,
+    "title": "Chickpea Salad",
+    "cuisine": "Mediterranean",
+    "difficulty": "Easy",
+    "time": 15,
+    "dietary": ["vegan", "gluten-free"],
+    "servings": 2,
+    "ingredients": ["chickpeas", "cucumber", "tomato", "olive oil", "lemon", "salt"],
+    "steps": ["Chop veggies", "Mix with chickpeas and dressing", "Serve chilled"],
+    "nutrition": { "calories": 300, "protein": 10 }
+  },
+  {
+    "id": 4,
+    "title": "Lentil Soup",
+    "cuisine": "Middle Eastern",
+    "difficulty": "Easy",
+    "time": 45,
+    "dietary": ["vegan", "vegetarian"],
+    "servings": 4,
+    "ingredients": ["lentils", "carrot", "onion", "celery", "vegetable broth", "cumin", "garlic"],
+    "steps": ["Sauté vegetables", "Add lentils and broth", "Simmer until tender", "Season and serve"],
+    "nutrition": { "calories": 250, "protein": 15 }
+  },
+  {
+    "id": 5,
+    "title": "Classic Beef Tacos",
+    "cuisine": "Mexican",
+    "difficulty": "Medium",
+    "time": 25,
+    "dietary": [],
+    "servings": 3,
+    "ingredients": ["ground beef", "taco shells", "lettuce", "tomato", "cheese", "onion", "taco seasoning"],
+    "steps": ["Brown the beef", "Add seasoning", "Warm taco shells", "Assemble tacos with toppings"],
+    "nutrition": { "calories": 480, "protein": 28 }
+  }
+]
