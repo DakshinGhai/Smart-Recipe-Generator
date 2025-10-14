@@ -1,11 +1,11 @@
-// src/components/RecipeCard.jsx
+
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, ChefHat, CircleAlert, Soup } from 'lucide-react';
+import { Clock, ChefHat, CircleAlert, Soup, Heart } from 'lucide-react';
 
 const getMatchColor = (score) => {
   if (score > 0.85) return 'bg-green-500';
-  if (score > 0.60) return 'bg-primary'; // Use brand color for medium match
+  if (score > 0.60) return 'bg-primary';
   return 'bg-red-500';
 };
 
@@ -14,39 +14,57 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-export default function RecipeCard({ recipe, onSelectRecipe }) {
+export default function RecipeCard({ recipe, onSelectRecipe, favorites, onToggleFavorite }) {
   const matchPercentage = (recipe.matchScore || 0) * 100;
+  
+  // Check if the current recipe is in the favorites list
+  const isFavorite = favorites.includes(recipe.id);
+
+  const handleFavoriteClick = (e) => {
+    // Prevent the card's main click event from firing
+    e.stopPropagation();
+    onToggleFavorite(recipe.id);
+  };
 
   return (
     <motion.div
-      // 1. Add the onClick handler to the main card container
       onClick={() => onSelectRecipe(recipe)}
-      // 2. Add cursor-pointer to indicate the whole card is clickable
       className="flex flex-col bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"
     >
-      <img
-        src={recipe.imageUrl || `https://placehold.co/600x400/F97316/white?text=${recipe.title.split(' ').join('+')}`}
-        alt={recipe.title}
-        className="w-full h-48 object-cover"
-      />
+      {/* Make the image container relative to position the heart icon */}
+      <div className="relative">
+        <img
+          src={recipe.imageUrl || `https://placehold.co/600x400/F97316/white?text=${recipe.title.split(' ').join('+')}`}
+          alt={recipe.title}
+          className="w-full h-48 object-cover"
+        />
+        {/* Heart Icon Button */}
+        <button
+          onClick={handleFavoriteClick}
+          className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 hover:scale-110 transition-transform"
+          aria-label="Add to favorites"
+        >
+          <Heart
+            size={24}
+            className={`transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-600'}`}
+            fill={isFavorite ? 'currentColor' : 'none'}
+          />
+        </button>
+      </div>
 
       <div className="p-5 flex flex-col flex-grow">
         <p className="text-sm text-gray-500 font-medium flex items-center gap-1">
           <Soup size={14} /> {recipe.cuisine}
         </p>
-        
         <h3 className="text-xl font-bold text-secondary mt-1 mb-3">{recipe.title}</h3>
-
         <div className="flex justify-between text-sm text-gray-600 border-t pt-3 mb-4">
           <span className="flex items-center gap-1.5"><Clock size={16} /> {recipe.time} mins</span>
           <span className="flex items-center gap-1.5"><ChefHat size={16} /> {recipe.difficulty}</span>
         </div>
-
         <div className="flex-grow" />
-
         <div className="space-y-3">
           {recipe.matchScore !== undefined && (
             <div>
@@ -64,7 +82,6 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
               </div>
             </div>
           )}
-
           {recipe.missing && recipe.missing.length > 0 && (
             <p className="text-xs text-red-600 flex items-start gap-1.5 mt-2">
               <CircleAlert size={14} className="flex-shrink-0 mt-px" />
@@ -73,12 +90,8 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
           )}
         </div>
       </div>
-
       <div className="p-4 border-t mt-auto">
-        {/* 3. The button is now just a visual element, so we remove its onClick handler */}
-        <div
-          className="w-full bg-primary text-black font-bold py-2.5 px-4 rounded-lg text-center"
-        >
+        <div className="w-full bg-primary text-black font-bold py-2.5 px-4 rounded-lg text-center">
           View Recipe
         </div>
       </div>

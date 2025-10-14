@@ -3,7 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const recipesRouter = require("./routes/recipes");
-require("dotenv").config(); // Add this line
+require("dotenv").config();
 const recognizeRouter = require("./routes/recognize");
 
 const app = express();
