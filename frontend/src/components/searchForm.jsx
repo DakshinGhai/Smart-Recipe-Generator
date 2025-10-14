@@ -1,7 +1,9 @@
 // src/components/SearchForm.jsx
-import React, { useState } from 'react';
-import { X, Search, Leaf, BarChart3, Clock } from 'lucide-react';
+
+import React, { useState, useRef } from 'react'; // 1. Import useRef
+import { X, Search, Leaf, BarChart3, Clock, UploadCloud, Loader } from 'lucide-react'; // 2. Import new icons
 import { motion } from 'framer-motion';
+import axios from 'axios'; // 3. Import axios to make API calls
 
 export default function SearchForm({ onSearch, isLoading }) {
   const [ingredients, setIngredients] = useState([]);
@@ -9,6 +11,11 @@ export default function SearchForm({ onSearch, isLoading }) {
   const [diet, setDiet] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [maxTime, setMaxTime] = useState('');
+
+  // --- NEW STATE FOR IMAGE RECOGNITION ---
+  const [isRecognizing, setIsRecognizing] = useState(false);
+  const [recognitionError, setRecognitionError] = useState(null);
+  const fileInputRef = useRef(null); // To trigger file input click
 
   const handleAddIngredient = (e) => {
     if ((e.key === 'Enter' || e.key === ',') && currentIngredient) {
@@ -33,6 +40,39 @@ export default function SearchForm({ onSearch, isLoading }) {
       difficulty,
       maxTime,
     });
+  };
+
+  // --- NEW FUNCTION TO HANDLE IMAGE RECOGNITION ---
+  const handleImageRecognition = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsRecognizing(true);
+    setRecognitionError(null);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      // Make sure your backend is running on the correct port (e.g., 5000)
+      const response = await axios.post('http://localhost:5000/api/recognize', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      
+      // Add new ingredients, avoiding duplicates
+      const recognizedIngredients = response.data.ingredients;
+      setIngredients(prev => {
+        const newIngredients = recognizedIngredients.filter(ing => !prev.includes(ing));
+        return [...prev, ...newIngredients];
+      });
+
+    } catch (error) {
+      console.error('Image recognition failed:', error);
+      setRecognitionError('Could not recognize ingredients. Please try another image.');
+    } finally {
+      setIsRecognizing(false);
+      // Reset file input so the same file can be selected again
+      if(fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -68,10 +108,43 @@ export default function SearchForm({ onSearch, isLoading }) {
         </div>
       </div>
 
+      {/* --- NEW IMAGE UPLOAD SECTION --- */}
+      <div className="text-center">
+        <p className="text-sm text-gray-500 my-2">OR</p>
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleImageRecognition}
+          disabled={isRecognizing}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current.click()}
+          disabled={isRecognizing}
+          className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 text-gray-500 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 hover:border-primary transition-colors duration-200 disabled:opacity-50 disabled:cursor-wait"
+        >
+          {isRecognizing ? (
+            <>
+              <Loader size={20} className="animate-spin" />
+              Recognizing...
+            </>
+          ) : (
+            <>
+              <UploadCloud size={20} />
+              Recognize from Image
+            </>
+          )}
+        </button>
+        {recognitionError && <p className="text-red-500 text-xs mt-2">{recognitionError}</p>}
+      </div>
+
       {/* 2. Guided Filter Selection with Icons */}
       <div className="space-y-4">
-        {/* Dietary Needs */}
-        <div className="relative">
+        {/* ... (rest of the form is unchanged) ... */}
+         {/* Dietary Needs */}
+         <div className="relative">
           <Leaf className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <select id="diet" value={diet} onChange={(e) => setDiet(e.target.value)} className="w-full pl-10 p-2.5 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
             <option value="">Any Dietary Needs</option>

@@ -19,12 +19,14 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
 
   return (
     <motion.div
-      className="flex flex-col bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2"
+      // 1. Add the onClick handler to the main card container
+      onClick={() => onSelectRecipe(recipe)}
+      // 2. Add cursor-pointer to indicate the whole card is clickable
+      className="flex flex-col bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 cursor-pointer"
       variants={cardVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* Use a real image! Placeholder uses brand color. */}
       <img
         src={recipe.imageUrl || `https://placehold.co/600x400/F97316/white?text=${recipe.title.split(' ').join('+')}`}
         alt={recipe.title}
@@ -43,7 +45,6 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
           <span className="flex items-center gap-1.5"><ChefHat size={16} /> {recipe.difficulty}</span>
         </div>
 
-        {/* This empty div pushes the score/missing to the bottom */}
         <div className="flex-grow" />
 
         <div className="space-y-3">
@@ -55,7 +56,7 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
                   {matchPercentage.toFixed(0)}%
                 </span>
               </div>
-              <div className="w-full bg-light rounded-full h-2.5">
+              <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                   className={`${getMatchColor(recipe.matchScore)} h-2.5 rounded-full`}
                   style={{ width: `${matchPercentage}%` }}
@@ -73,14 +74,13 @@ export default function RecipeCard({ recipe, onSelectRecipe }) {
         </div>
       </div>
 
-      {/* Branded button in the footer */}
-      <div className="p-4 bg-light border-t mt-auto">
-        <button
-          onClick={() => onSelectRecipe(recipe)}
-          className="w-full bg-primary text-white font-bold py-2.5 px-4 rounded-lg hover:bg-primary-dark transition-colors duration-200"
+      <div className="p-4 border-t mt-auto">
+        {/* 3. The button is now just a visual element, so we remove its onClick handler */}
+        <div
+          className="w-full bg-primary text-black font-bold py-2.5 px-4 rounded-lg text-center"
         >
           View Recipe
-        </button>
+        </div>
       </div>
     </motion.div>
   );

@@ -1,55 +1,56 @@
 // src/components/Header.jsx
+
 import React, { useState } from 'react';
-import { Heart, Menu, X } from 'lucide-react'; // Added Menu and X icons
+import { Menu, X } from 'lucide-react';
 import { useScroll } from '../hooks/useScroll';
 import logo from '../assets/logo.png';
-import { motion, AnimatePresence } from 'framer-motion'; // For animations
+import { motion, AnimatePresence } from 'framer-motion';
+import AboutModal from './AboutModal';
+import HowItWorksModal from './HowItWorksModal'; // 1. Import the new modal
 
-export default function Header() {
+export default function Header() { // NOTE: No 'onGetStartedClick' prop needed anymore
   const scrollY = useScroll();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // Header becomes solid and blurred after scrolling 50px
+  const [isAboutModalOpen, setAboutModalOpen] = useState(false);
+
+  // 2. Add state for the "How It Works" modal
+  const [isHowItWorksModalOpen, setHowItWorksModalOpen] = useState(false);
+
   const isScrolled = scrollY > 50;
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const navLinkClasses = (scrolled) => 
-    `text-md font-medium transition-colors duration-300 ${
-      scrolled 
-      ? 'text-gray-600 hover:text-primary' 
-      : 'text-white hover:text-primary-light'
+  const navLinkClasses = (scrolled) =>
+    `text-md font-medium transition-colors duration-300 cursor-pointer ${
+      scrolled
+        ? 'text-gray-600 hover:text-primary'
+        : 'text-white hover:text-primary-light'
     }`;
-  
+
+  const handleOpenAboutModal = () => setAboutModalOpen(true);
+  const handleCloseAboutModal = () => setAboutModalOpen(false);
+
+  // 3. Create handlers for the new modal
+  const handleOpenHowItWorksModal = () => setHowItWorksModalOpen(true);
+  const handleCloseHowItWorksModal = () => setHowItWorksModalOpen(false);
+
   return (
     <>
-      <header
-        className={`
-          fixed top-0 left-0 w-full z-30 transition-all duration-300
-          ${isScrolled 
-            ? 'bg-white/80 shadow-md backdrop-blur-sm' 
-            : 'bg-transparent'
-          }
-        `}
-      >
+      <header /* ... */ >
         <div className="max-w-7xl mx-auto flex items-center justify-between p-4">
-          {/* Logo */}
           <a href="/" className="flex items-center gap-3 cursor-pointer ml-10">
             <img src={logo} alt="Smart Recipe Logo" className="h-15 w-auto" />
           </a>
-
-          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#about" className={navLinkClasses(isScrolled)}>About</a>
+            <button onClick={handleOpenAboutModal} className={navLinkClasses(isScrolled)}>About</button>
             <a href="#favorites" className={navLinkClasses(isScrolled)}>Favorites</a>
-            <button className="bg-white text-amber-500 font-bold py-2 px-5 rounded-full hover:bg-primary-dark transition-colors">
+            {/* 4. Update the "Get Started" button's onClick */}
+            <button
+              onClick={handleOpenHowItWorksModal}
+              className="bg-white text-amber-500 font-bold py-2 px-5 rounded-full hover:bg-primary-dark transition-colors"
+            >
               Get Started
             </button>
           </nav>
-
-          {/* Mobile Menu Button (Hamburger) */}
           <div className="md:hidden">
             <button onClick={toggleMobileMenu}>
               <Menu size={28} className={isScrolled ? 'text-secondary' : 'text-white'} />
@@ -58,31 +59,33 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
-            className="fixed top-0 right-0 h-full w-full max-w-sm bg-white z-50 p-6"
-          >
+          <motion.div /* ... */ >
             <div className="flex justify-end mb-8">
-              <button onClick={toggleMobileMenu}>
-                <X size={30} className="text-gray-700" />
-              </button>
+              <button onClick={toggleMobileMenu}><X size={30} className="text-gray-700" /></button>
             </div>
             <nav className="flex flex-col items-center gap-8">
-              <a href="#about" onClick={toggleMobileMenu} className="text-2xl font-semibold text-gray-700 hover:text-primary">About</a>
+              <button onClick={() => { handleOpenAboutModal(); toggleMobileMenu(); }} className="text-2xl font-semibold text-gray-700 hover:text-primary">About</button>
               <a href="#favorites" onClick={toggleMobileMenu} className="text-2xl font-semibold text-gray-700 hover:text-primary">Favorites</a>
-              <button className="bg-primary text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-primary-dark transition-colors mt-4">
+              {/* 5. Update the mobile "Get Started" button's onClick */}
+              <button
+                onClick={() => {
+                  handleOpenHowItWorksModal();
+                  toggleMobileMenu();
+                }}
+                className="bg-primary text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-primary-dark transition-colors mt-4"
+              >
                 Get Started
               </button>
             </nav>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AboutModal isOpen={isAboutModalOpen} onClose={handleCloseAboutModal} />
+      {/* 6. Render the new modal */}
+      <HowItWorksModal isOpen={isHowItWorksModalOpen} onClose={handleCloseHowItWorksModal} />
     </>
   );
 }
