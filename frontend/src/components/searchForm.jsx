@@ -54,7 +54,7 @@ export default function SearchForm({ onSearch, isLoading }) {
 
     try {
       // Make sure your backend is running on the correct port (e.g., 5000)
-      const response = await axios.post('http://localhost:5000/api/recognize', formData, {
+      const response = await axios.post('https://smart-recipe-generator-h0c8.onrender.com/api/recognize', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       

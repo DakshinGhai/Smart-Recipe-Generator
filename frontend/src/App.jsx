@@ -5,7 +5,7 @@ import React, { useState, useRef } from 'react';
 
 // Component Imports
 import Header from './components/Header';
-import SearchForm from './components/SearchForm';
+import SearchForm from './components/searchForm';
 import RecipeList from './components/RecipeList';
 import RecipeModal from './components/RecipeModal';
 
