@@ -13,7 +13,7 @@ const app = express();
 // 1. Define the list of allowed origins (NO trailing slash)
 const allowedOrigins = [
   "http://localhost:3000", // For local development
-  "https://smart-recipe-generator-42r8rb3ma-dakshinghais-projects.vercel.app", // Your live Vercel URL
+  "https://smart-recipe-generator-bice.vercel.app/", // Your live Vercel URL
 ];
 
 const corsOptions = {
