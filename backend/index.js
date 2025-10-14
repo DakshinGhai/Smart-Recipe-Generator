@@ -1,41 +1,43 @@
 // backend/index.js
 
 const express = require("express");
-const cors = require("cors"); // Make sure cors is imported
+const cors = require("cors");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
-const recipesRouter = require("./routes/recipes");
 const recognizeRouter = require("./routes/recognize");
 
 const app = express();
 
-// --- START: CORS CONFIGURATION ---
+// --- START: CORRECT CORS CONFIGURATION ---
 
-// 1. Define the list of allowed origins
+// 1. Define the list of allowed origins (NO trailing slash)
 const allowedOrigins = [
   "http://localhost:3000", // For local development
-  "https://smart-recipe-generator-42r8rb3ma-dakshinghais-projects.vercel.app",
-  "https://smart-recipe-generator-1ddc.vercel.app", // IMPORTANT: Add your Vercel URL here later
+  "https://smart-recipe-generator-42r8rb3ma-dakshinghais-projects.vercel.app", // Your live Vercel URL
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg =
-        "The CORS policy for this site does not allow access from the specified Origin.";
-      return callback(new Error(msg), false);
+    // Allow requests with no origin (like Postman) or from our list
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(
+        new Error(
+          "The CORS policy for this site does not allow access from your origin."
+        )
+      );
     }
-    return callback(null, true);
   },
 };
 
+// --- END: CORS CONFIGURATION ---
+
 app.use(helmet());
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); // Use the new cors options
 app.use(bodyParser.json());
 
-app.use("/api/recipes", recipesRouter);
+// Only the recognize router is needed now
 app.use("/api/recognize", recognizeRouter);
 
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
