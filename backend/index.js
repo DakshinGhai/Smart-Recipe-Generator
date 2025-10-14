@@ -14,7 +14,7 @@ const app = express();
 // 1. Define the list of allowed origins
 const allowedOrigins = [
   "http://localhost:3000", // For local development
-  "https://smart-recipe-generator-42r8rb3ma-dakshinghais-projects.vercel.app/", // IMPORTANT: Add your Vercel URL here later
+  "https://smart-recipe-generator-42r8rb3ma-dakshinghais-projects.vercel.app", // IMPORTANT: Add your Vercel URL here later
 ];
 
 const corsOptions = {
