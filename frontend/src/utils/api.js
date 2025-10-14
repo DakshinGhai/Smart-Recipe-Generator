@@ -1,5 +1,5 @@
 import axios from "axios";
-const BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000/api";
+const BASE = "https://smart-recipe-generator-h0c8.onrender.com/api";
 export const fetchRecipes = (params) =>
   axios.get(`${BASE}/recipes`, { params }).then((r) => r.data);
 export const fetchRecipe = (id) =>

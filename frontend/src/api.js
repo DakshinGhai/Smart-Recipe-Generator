@@ -1,31 +1,70 @@
 // src/api.js
 
-const API_BASE_URL = "http://localhost:5000/api";
+import allRecipes from "./data/recipes.json";
 
 /**
- * Fetches recipes from the backend based on user-provided filters.
- * @param {object} params - The query parameters for the API call.
- * @param {string} params.ingredients - Comma-separated string of ingredients.
- * @param {string} params.diet - Comma-separated string of dietary preferences.
- * @param {number} params.maxTime - Maximum cooking time in minutes.
- * @param {string} params.difficulty - Recipe difficulty ('Easy', 'Medium', 'Hard').
- * @returns {Promise<Array>} A promise that resolves to an array of recipe objects.
+ * Filters and scores recipes locally from the imported JSON file.
+ * This replaces the need for a backend API call for recipes.
+ * @param {object} searchParams - The search criteria from the form.
+ * @returns {Array} - A sorted array of matching recipes.
  */
-export async function fetchRecipes(params) {
-  // Clean up the params object to remove any empty values
-  const cleanedParams = Object.fromEntries(
-    Object.entries(params).filter(([_, v]) => v != null && v !== '')
-  );
+export const fetchLocalRecipes = (searchParams) => {
+  const { ingredients, diet, maxTime, difficulty } = searchParams;
+  let filteredRecipes = allRecipes;
 
-  const queryString = new URLSearchParams(cleanedParams).toString();
-  const url = `${API_BASE_URL}/recipes?${queryString}`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Something went wrong with the server.");
+  // --- 1. Apply optional filters first ---
+  if (diet) {
+    filteredRecipes = filteredRecipes.filter(
+      (r) =>
+        r.dietary &&
+        r.dietary.map((d) => d.toLowerCase()).includes(diet.toLowerCase())
+    );
+  }
+  if (difficulty) {
+    filteredRecipes = filteredRecipes.filter(
+      (r) => r.difficulty.toLowerCase() === difficulty.toLowerCase()
+    );
+  }
+  if (maxTime) {
+    const time = parseInt(maxTime, 10);
+    if (!isNaN(time)) {
+      filteredRecipes = filteredRecipes.filter((r) => r.time <= time);
+    }
   }
 
-  return response.json();
-}
+  // --- 2. If ingredients are provided, score and sort ---
+  if (ingredients && ingredients.trim() !== "") {
+    const userIngredients = ingredients
+      .split(",")
+      .map((i) => i.trim().toLowerCase());
+
+    const scoredRecipes = filteredRecipes
+      .map((recipe) => {
+        const recipeIngredients = recipe.ingredients.map((i) =>
+          i.toLowerCase()
+        );
+        const matchedIngredients = recipeIngredients.filter((recipeIng) =>
+          userIngredients.includes(recipeIng)
+        );
+        const missingIngredients = recipeIngredients.filter(
+          (recipeIng) => !userIngredients.includes(recipeIng)
+        );
+
+        const matchScore = matchedIngredients.length / recipeIngredients.length;
+
+        return {
+          ...recipe,
+          matchScore,
+          missing: missingIngredients,
+        };
+      })
+      .filter((recipe) => recipe.matchScore > 0); // Only return recipes with at least one match
+
+    // Sort by the best match score
+    scoredRecipes.sort((a, b) => b.matchScore - a.matchScore);
+    return scoredRecipes;
+  }
+
+  // If no ingredients, return the filtered list
+  return filteredRecipes;
+};
